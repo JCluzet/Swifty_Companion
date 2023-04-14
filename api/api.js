@@ -34,10 +34,7 @@ export const getAccessToken = async (code) => {
 
   try {
     response = await axios(config);
-    // console.dir(response.data);
     AsyncStorage.setItem('accessToken', response.data.access_token);
-    // console.log("BRO" + response.data.access_token);
-    // AsyncStorage.setItem('accessToken', response.data.access_token);
     return response.data;
   } catch (error) {
     if (response) {
@@ -52,7 +49,6 @@ export const getAccessToken = async (code) => {
 
 export const getStudents = async (userId) => {
   const accessToken = await AsyncStorage.getItem('accessToken');
-  // console.log("URGENT > " + accessToken);
 
   const response = await instance.get(`https://api.intra.42.fr/v2/users/${userId}`, {
     headers: {

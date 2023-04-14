@@ -21,7 +21,6 @@ function getCodeFromUrl(url) {
       return value;
     }
   }
-
   return null;
 }
 
@@ -29,6 +28,18 @@ const SearchScreen = () => {
   const [login, setLogin] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function checkConnect() {
+      const connect = await AsyncStorage.getItem("connect");
+
+      if (connect) {
+        AsyncStorage.setItem("connect", "true");
+        handleConnect();
+      }
+    }
+    checkConnect();
+  }, []);
 
   const { setIsAuthenticated } = useContext(AuthContext);
 

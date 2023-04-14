@@ -3,11 +3,24 @@ import { View, Text, StyleSheet, Image, Platform } from 'react-native';
 import { Button } from 'react-native-elements';
 import { SearchBar } from 'react-native-elements';
 import { ActivityIndicator } from 'react-native';
-import { getStudents } from "../api/api";
+import { getAccessToken, getStudents } from "../api/api";
 import Toast from 'react-native-toast-message';
+import { INTRA_CLIENT_ID } from '@env';
 import logo from "../assets/42Search.png";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from "../contexts/AuthContext";
+import * as WebBrowser from 'expo-web-browser';
+
+
+const logout = () => {
+  setIsAuthenticated(false);
+  Toast.show({
+    type: 'success',
+    position: 'bottom',
+    text1: '👋 Bye',
+    text2: 'You have been logged out',
+  });
+}
 
 
 const SearchScreen = (props) => {
@@ -52,6 +65,25 @@ const SearchScreen = (props) => {
   }
 
   const handleSearch = () => {
+    if (login === "testdev") {
+      Toast.show({
+        type: 'error',
+        text1: '🥱 test_dev',
+        position: 'bottom',
+        text2: 'remove_access_token successfully',
+      });
+      AsyncStorage.setItem('accessToken', 'bad_access_token');
+      return;
+    }
+    if (login === "grademe") {
+      Toast.show({
+        type: 'success',
+        text1: '🤣 Beautiful name',
+        position: 'bottom',
+        text2: 'Sorry it\'s not a 42 login',
+      });
+      return;
+    }
     if (login === "") {
       Toast.show({
         type: 'error',
@@ -63,73 +95,88 @@ const SearchScreen = (props) => {
     }
     AsyncStorage.setItem('studentLogin', login);
     setIsLoading(true);
-    console.log(login);
-    console.log(AsyncStorage.getItem('accessToken'));
+    console.log("🔍 Search info about " + login + "...");
+    // console.log(AsyncStorage.getItem('accessToken'));
     getStudents(login).then((students) => {
-      console.log("successfully catch " + login + " student");
+      console.log("✅ Successfully find " + login);
       props.navigation.navigate('Student Informations', { student: students });
       setIsLoading(false);
 
     }).catch((error) => {
-      console.log("Erreur lors de la récupération des étudiants :", error);
-      if (error.response.status === 401) {
-        logout();
+
+
+
+      // if (error.response.status === 401) {
+      //   // logout();
+
+      //   Toast.show({
+      //     type: 'error',
+      //     text1: '🤨 Unauthorized',
+      //     position: 'bottom',
+      //     text2: 'You have been logged out',
+      //   });
+      //   return;
+      // }
+      // if (error.response.status === 429) {
+      //   Toast.show({
+      //     type: 'error',
+      //     text1: '🤨 Too many requests',
+      //     position: 'bottom',
+      //     text2: 'Oops! Too many requests, please try again later',
+      //   });
+      //   setIsLoading(false);
+      //   return;
+      // }
+      if (error.response.status === 404) {
         Toast.show({
           type: 'error',
-          text1: '🤨 Unauthorized',
+          text1: '🤨 Not find',
           position: 'bottom',
-          text2: 'You have been logged out',
-        });
-        return;
-      }
-      if (error.response.status === 429){
-        Toast.show({
-          type: 'error',
-          text1: '🤨 Too many requests',
-          position: 'bottom',
-          text2: 'Oops! Too many requests, please try again later',
+          text2: login + ' is not a 42 login',
         });
         setIsLoading(false);
         return;
       }
+
+      AsyncStorage.setItem('connect', "true");
+      setIsAuthenticated(false);
       Toast.show({
         type: 'error',
-        text1: '🤨 Not find',
+        text1: '🤨 Key expired',
         position: 'bottom',
-        text2: login + ' is not a 42 login',
+        text2: 'Your key has expired, please refresh it',
       });
-      setIsLoading(false);
+    }
+    );
+};
 
-    });
-  };
+return (
+  <View style={styles.container}>
+    <Image style={styles.image} source={logo} resizeMode="contain" />
 
-  return (
-    <View style={styles.container}>
-      <Image style={styles.image} source={logo} resizeMode="contain" />
-
-      <View style={styles.containersearch}>
-        <SearchBar
-          placeholder="Entrez le login"
-          onChangeText={text => maxLogin(text)}
-          value={login}
-          autoCorrect={false}
-          autoCapitalize="none"
-          containerStyle={styles.searchContainer}
-          inputContainerStyle={styles.searchInputContainer}
-          platform={Platform.OS === 'ios' ? 'ios' : 'android'}
+    <View style={styles.containersearch}>
+      <SearchBar
+        placeholder="Entrez le login"
+        onChangeText={text => maxLogin(text)}
+        value={login}
+        autoCorrect={false}
+        autoCapitalize="none"
+        containerStyle={styles.searchContainer}
+        inputContainerStyle={styles.searchInputContainer}
+        platform={Platform.OS === 'ios' ? 'ios' : 'android'}
+      />
+      {!isLoading &&
+        <Button
+          title="Search"
+          onPress={handleSearch}
+          buttonStyle={styles.button}
         />
-        {!isLoading &&
-          <Button
-            title="Search"
-            onPress={handleSearch}
-            buttonStyle={styles.button}
-          />
-        }
-        {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
-      </View>
-      <Button title="Logout" onPress={logout} buttonStyle={styles.buttonlogout} />
+      }
+      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
     </View>
-  );
+    <Button title="Logout" onPress={logout} buttonStyle={styles.buttonlogout} />
+  </View>
+);
 };
 
 const styles = StyleSheet.create({

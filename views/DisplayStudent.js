@@ -32,7 +32,7 @@ const DisplayStudent = ({ route }) => {
   };
 
   const { student } = route.params;
-  console.log(JSON.stringify(student, null, 2));
+  // console.log(JSON.stringify(student, null, 2));
 
 
 
