@@ -8,6 +8,8 @@ import * as WebBrowser from 'expo-web-browser';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { AuthContext } from "../contexts/AuthContext";
+import { ActivityIndicator } from 'react-native';
+
 
 function getCodeFromUrl(url) {
   const queryString = url.split('?')[1];
@@ -26,6 +28,7 @@ function getCodeFromUrl(url) {
 const SearchScreen = () => {
   const [login, setLogin] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { setIsAuthenticated } = useContext(AuthContext);
 
@@ -37,6 +40,7 @@ const SearchScreen = () => {
     const clientId = INTRA_CLIENT_ID;
     const authUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code`;
 
+    setIsLoading(true);
     await WebBrowser.dismissBrowser();
     const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
 
@@ -54,6 +58,7 @@ const SearchScreen = () => {
             text2: 'You can now search for students',
           });
           console.log('user connected to 42 successfully ✅');
+    setIsLoading(true);
         }
       }
       else {
@@ -65,12 +70,15 @@ const SearchScreen = () => {
           text2: 'You decline the access',
         });
         await AsyncStorage.removeItem('token');
+    setIsLoading(false);
 
       }
     }
     else {
       await AsyncStorage.removeItem('token');
       console.log('error while connecting to 42');
+    setIsLoading(false);
+
     }
   };
 
@@ -80,11 +88,14 @@ const SearchScreen = () => {
 
       <View style={styles.containersearch}>
         <Text style={styles.title}>Connect to 42 account</Text>
+        {!isLoading &&
         <Button
           title="Connect to 42"
           onPress={handleConnect}
           buttonStyle={styles.button}
         />
+        }
+        {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
       </View>
     </View>
   );

@@ -28,9 +28,11 @@
     "react-native": "0.71.6",
     "react-native-dotenv": "^3.4.8",
     "react-native-elements": "^3.4.3",
+    "react-native-fs": "^2.20.0",
     "react-native-root-siblings": "^4.1.1",
     "react-native-toast-message": "^2.1.6",
-    "react-native-web": "~0.18.10"
+    "react-native-web": "~0.18.10",
+    "expo-splash-screen": "~0.18.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

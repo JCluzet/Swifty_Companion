@@ -52,7 +52,6 @@ const SearchScreen = (props) => {
   }
 
   const handleSearch = () => {
-    setIsLoading(true);
     if (login === "") {
       Toast.show({
         type: 'error',
@@ -62,6 +61,7 @@ const SearchScreen = (props) => {
       });
       return;
     }
+    setIsLoading(true);
     console.log(login);
     console.log(AsyncStorage.getItem('accessToken'));
     getStudents(login).then((students) => {
@@ -83,9 +83,9 @@ const SearchScreen = (props) => {
       }
       Toast.show({
         type: 'error',
-        text1: 'Introuvable',
+        text1: '🤨 Not find',
         position: 'bottom',
-        text2: login + ' n\'est pas un login 42',
+        text2: login + ' is not a 42 login',
       });
       setIsLoading(false);
 
