@@ -53,7 +53,7 @@ function AppNavigation() {
                   }}
                 />
                 <Stack.Screen
-                  name="StudentInfo"
+                  name='Student Informations'
                   component={DisplayStudent}
                   options={{
                     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,

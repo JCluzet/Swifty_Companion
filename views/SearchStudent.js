@@ -61,12 +61,13 @@ const SearchScreen = (props) => {
       });
       return;
     }
+    AsyncStorage.setItem('studentLogin', login);
     setIsLoading(true);
     console.log(login);
     console.log(AsyncStorage.getItem('accessToken'));
     getStudents(login).then((students) => {
       console.log("successfully catch " + login + " student");
-      props.navigation.navigate('StudentInfo', { student: students });
+      props.navigation.navigate('Student Informations', { student: students });
       setIsLoading(false);
 
     }).catch((error) => {
@@ -79,6 +80,16 @@ const SearchScreen = (props) => {
           position: 'bottom',
           text2: 'You have been logged out',
         });
+        return;
+      }
+      if (error.response.status === 429){
+        Toast.show({
+          type: 'error',
+          text1: '🤨 Too many requests',
+          position: 'bottom',
+          text2: 'Oops! Too many requests, please try again later',
+        });
+        setIsLoading(false);
         return;
       }
       Toast.show({

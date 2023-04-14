@@ -10,7 +10,9 @@ const getStatusColor = (project) => {
   }
   if (project["validated?"] === false) {
     return "red";
-
+  }
+  if (project["final_mark"] === 0) {
+    return "red";
   }
   switch (project.status) {
     case "in_progress":
@@ -30,22 +32,35 @@ const DisplayStudent = ({ route }) => {
   };
 
   const { student } = route.params;
-  // console.log(JSON.stringify(student, null, 2));
+  console.log(JSON.stringify(student, null, 2));
 
 
 
   const displaySkills = (skills) => {
-    return skills.map((skill) => (
-      <View key={skill.id}>
-        <View>
-          <Text style={styles.text}>{skill.name}</Text>
+    return skills
+      .sort((a, b) => b.level - a.level)
+      .map((skill) => (
+        <View key={skill.id} style={styles.skillContainer}>
+          <Text
+            style={[
+              styles.skillName,
+              {
+                fontSize: skill.name.length > 30 ? 12 : 14, // Ajustez ces valeurs en fonction de vos préférences
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {skill.name}
+          </Text>
+
+          <View style={styles.skill_level}>
+            <Text style={styles.skillName_level}>lvl {skill.level}</Text>
+          </View>
         </View>
-        <View key={skill.id}>
-          <Text style={styles.text}>Niveau: {skill.level}</Text>
-        </View>
-      </View>
-    ));
+      ));
   };
+
 
   const everUseGrademe = (login) => {
     const [hasUsedGradeMe, setHasUsedGradeMe] = useState(null);
@@ -74,7 +89,7 @@ const DisplayStudent = ({ route }) => {
     }
 
     return (
-      <View style={styles.row}>
+      <View style={styles.row_grademe}>
 
         <Text style={styles.text}>GradeMe User: </Text>
         <Text style={{ color: hasUsedGradeMe ? 'green' : 'red' }}>
@@ -139,6 +154,17 @@ const DisplayStudent = ({ route }) => {
       ));
   };
 
+  getAverage = (projects_users) => {
+    let sum = 0;
+    let count = 0;
+    projects_users.forEach((project_user) => {
+      if (project_user.final_mark !== null) {
+        sum += project_user.final_mark;
+        count++;
+      }
+    });
+    return Math.round(sum / count);
+  };
 
 
   return (
@@ -152,24 +178,16 @@ const DisplayStudent = ({ route }) => {
       <Text style={styles.text}>Wallet: {student.wallet}</Text>
       <Text style={styles.text}>Correction points: {student.correction_point}</Text>
       <Text style={styles.text}>Level: {student.cursus_users[1].level}</Text>
+      <Text style={styles.text}>Grade: {student.cursus_users[1].grade}</Text>
       <View style={styles.separator} />
       <View style={styles.separator} />
       <Text style={styles.text_project}>Projects:</Text>
       {displayProjects(student.projects_users)}
       <View style={styles.separator} />
       <View style={styles.separator} />
-      <Text style={styles.text}>Skills:</Text>
-      {/* {displaySkills(student.cursus_users[1].skills)} */}
+      <Text style={styles.text_project}>Skills:</Text>
+      {displaySkills(student.cursus_users[1].skills)}
       {everUseGrademe(student.login)}
-      {/* <Text style={styles.text}>Skills: {student.cursus_users[0].skills.length}</Text> */}
-      {/* </View> */}
-      {/* {displaySkills(student.cursus_users[1].skills)} */}
-      {/* {displayCampus(student.campus[0].city)} */}
-      {/* <Text style={styles.text}>Cursus:</Text> */}
-      {/* {displayCursus(student.cursus_users)} */}
-      {/* <Text style={styles.text}>Réalisations:</Text> */}
-      {/* {displayAchievements(student.achievements)} */}
-      {/* <Button title="BACK" onPress={rm_stud} buttonStyle={styles.buttonlogout} /> */}
     </ScrollView>
   );
 };
@@ -182,7 +200,7 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
     alignItems: "center",
-    padding: 16,
+    padding: 5,
     fontFamily: 'Courier New',
     fontSize: 17,
   },
@@ -246,6 +264,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  row_grademe: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 30,
+  },
   projectName: {
     flex: 1,
     marginRight: 8, // Ajoutez une marge à droite pour éviter que le texte ne chevauche l'indicateur de statut
@@ -286,6 +311,29 @@ const styles = StyleSheet.create({
     width: 400,
     height: 100,
     marginTop: 10,
+  },
+  skillContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  skillName: {
+    // fontWeight: "bold",
+    fontSize: 14,
+    flex: 1,
+  },
+  skill_level: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  skillName_level: {
+    fontSize: 12,
+    marginLeft: 8,
+    fontWeight: "bold",
   },
 });
 
