@@ -1,0 +1,7 @@
+- Mettre les variables dans le .env ✅
+- push sur Github
+- Regler l'affichage en defilant de l'user
+- Afficher correctement les skills et projets
+- Clean le code
+- Clean les fichiers
+
