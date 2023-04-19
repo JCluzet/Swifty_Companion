@@ -21,7 +21,6 @@ function AppNavigation() {
   const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
-      SplashScreen.preventAutoHideAsync();
     const checkToken = async () => {
       try {
         const accessToken = await AsyncStorage.getItem('accessToken');

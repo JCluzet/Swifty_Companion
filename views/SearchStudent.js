@@ -3,25 +3,11 @@ import { View, Text, StyleSheet, Image, Platform } from 'react-native';
 import { Button } from 'react-native-elements';
 import { SearchBar } from 'react-native-elements';
 import { ActivityIndicator } from 'react-native';
-import { getAccessToken, getStudents } from "../api/api";
+import { getStudents } from "../api/api";
 import Toast from 'react-native-toast-message';
-import { INTRA_CLIENT_ID } from '@env';
 import logo from "../assets/42Search.png";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from "../contexts/AuthContext";
-import * as WebBrowser from 'expo-web-browser';
-
-
-const logout = () => {
-  setIsAuthenticated(false);
-  Toast.show({
-    type: 'success',
-    position: 'bottom',
-    text1: '👋 Bye',
-    text2: 'You have been logged out',
-  });
-}
-
 
 const SearchScreen = (props) => {
   const [login, setLogin] = useState("");
@@ -55,35 +41,27 @@ const SearchScreen = (props) => {
   }
 
   const logout = () => {
+    AsyncStorage.removeItem('connect');
     setIsAuthenticated(false);
     Toast.show({
       type: 'success',
       position: 'bottom',
       text1: '👋 Bye',
-      text2: 'You have been logged out',
+      text2: '‼️ Logout from 42 intra to fully logout from the app',
     });
   }
 
   const handleSearch = () => {
-    if (login === "testdev") {
-      Toast.show({
-        type: 'error',
-        text1: '🥱 test_dev',
-        position: 'bottom',
-        text2: 'remove_access_token successfully',
-      });
-      AsyncStorage.setItem('accessToken', 'bad_access_token');
-      return;
-    }
-    if (login === "grademe") {
-      Toast.show({
-        type: 'success',
-        text1: '🤣 Beautiful name',
-        position: 'bottom',
-        text2: 'Sorry it\'s not a 42 login',
-      });
-      return;
-    }
+    // if (login === "testdev") {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: '🥱 test_dev',
+    //     position: 'bottom',
+    //     text2: 'remove_access_token successfully',
+    //   });
+    //   AsyncStorage.setItem('accessToken', 'bad_access_token');
+    //   return;
+    // }
     if (login === "") {
       Toast.show({
         type: 'error',
@@ -103,30 +81,6 @@ const SearchScreen = (props) => {
       setIsLoading(false);
 
     }).catch((error) => {
-
-
-
-      // if (error.response.status === 401) {
-      //   // logout();
-
-      //   Toast.show({
-      //     type: 'error',
-      //     text1: '🤨 Unauthorized',
-      //     position: 'bottom',
-      //     text2: 'You have been logged out',
-      //   });
-      //   return;
-      // }
-      // if (error.response.status === 429) {
-      //   Toast.show({
-      //     type: 'error',
-      //     text1: '🤨 Too many requests',
-      //     position: 'bottom',
-      //     text2: 'Oops! Too many requests, please try again later',
-      //   });
-      //   setIsLoading(false);
-      //   return;
-      // }
       if (error.response.status === 404) {
         Toast.show({
           type: 'error',
@@ -164,6 +118,7 @@ return (
         containerStyle={styles.searchContainer}
         inputContainerStyle={styles.searchInputContainer}
         platform={Platform.OS === 'ios' ? 'ios' : 'android'}
+        onSubmitEditing={handleSearch}
       />
       {!isLoading &&
         <Button

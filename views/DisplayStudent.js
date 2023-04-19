@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, Platform } from 'react-native';
-import { ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, Platform } from "react-native";
+import { ScrollView } from "react-native";
 
 const getStatusColor = (project) => {
   if (project["validated?"] === true) {
@@ -28,14 +28,10 @@ const getStatusColor = (project) => {
 
 const DisplayStudent = ({ route }) => {
   const rm_stud = () => {
-    AsyncStorage.removeItem('student');
+    AsyncStorage.removeItem("student");
   };
 
   const { student } = route.params;
-  // console.log(JSON.stringify(student, null, 2));
-
-
-
   const displaySkills = (skills) => {
     return skills
       .sort((a, b) => b.level - a.level)
@@ -45,7 +41,7 @@ const DisplayStudent = ({ route }) => {
             style={[
               styles.skillName,
               {
-                fontSize: skill.name.length > 30 ? 12 : 14, // Ajustez ces valeurs en fonction de vos préférences
+                fontSize: skill.name.length > 30 ? 12 : 14,
               },
             ]}
             numberOfLines={1}
@@ -61,14 +57,13 @@ const DisplayStudent = ({ route }) => {
       ));
   };
 
-
   const everUseGrademe = (login) => {
     const [hasUsedGradeMe, setHasUsedGradeMe] = useState(null);
 
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get('https://user.grademe.fr/exam.txt');
+          const response = await axios.get("https://user.grademe.fr/exam.txt");
           const textData = response.data;
 
           if (textData.includes(login)) {
@@ -77,7 +72,10 @@ const DisplayStudent = ({ route }) => {
             setHasUsedGradeMe(false);
           }
         } catch (error) {
-          console.error('Erreur lors de la récupération du fichier exam.txt:', error);
+          console.error(
+            "Erreur lors de la récupération du fichier exam.txt:",
+            error
+          );
         }
       };
 
@@ -85,20 +83,18 @@ const DisplayStudent = ({ route }) => {
     }, [login]);
 
     if (hasUsedGradeMe === null) {
-      return null; // Vous pouvez afficher un indicateur de chargement ici si vous le souhaitez
+      return null;
     }
 
     return (
       <View style={styles.row_grademe}>
-
         <Text style={styles.text}>GradeMe User: </Text>
-        <Text style={{ color: hasUsedGradeMe ? 'green' : 'red' }}>
-          {hasUsedGradeMe ? 'YES' : 'NO'}
+        <Text style={{ color: hasUsedGradeMe ? "green" : "red" }}>
+          {hasUsedGradeMe ? "YES" : "NO"}
         </Text>
       </View>
     );
   };
-
 
   const displayProjects = (projects_users) => {
     return projects_users
@@ -124,12 +120,12 @@ const DisplayStudent = ({ route }) => {
             style={[
               styles.projectName,
               {
-                fontSize:
-                  project_user.project.name.length > 30 ? 12 : 14, // Ajustez ces valeurs en fonction de vos préférences
+                fontSize: project_user.project.name.length > 30 ? 12 : 14,
               },
             ]}
             numberOfLines={1}
-            ellipsizeMode="tail">
+            ellipsizeMode="tail"
+          >
             {project_user.project.name}
           </Text>
 
@@ -166,26 +162,55 @@ const DisplayStudent = ({ route }) => {
     return Math.round(sum / count);
   };
 
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image style={styles.studentImage} source={{ uri: student.image.link }} resizeMode="cover" />
+      <Image
+        style={styles.studentImage}
+        source={{ uri: student.image.link }}
+        resizeMode="cover"
+      />
       <Text style={styles.login}>{student.login}</Text>
-      <Text style={styles.text}>{student.first_name} {student.last_name}</Text>
+      <Text style={styles.text}>
+        {student.first_name} {student.last_name}
+      </Text>
       <Text style={styles.text}>Email: {student.email}</Text>
       <Text style={styles.text}>Phone number: {student.phone}</Text>
-      <Text style={styles.text}>City: {student.campus[0].city}</Text>
+      <Text style={styles.text}>Campus: {student.campus[0].city}</Text>
       <Text style={styles.text}>Wallet: {student.wallet}</Text>
-      <Text style={styles.text}>Correction points: {student.correction_point}</Text>
+      <Text style={styles.text}>
+        Correction points: {student.correction_point}
+      </Text>
       <Text style={styles.text}>Level: {student.cursus_users[1].level}</Text>
-      <Text style={styles.text}>Grade: {student.cursus_users[1].grade}</Text>
+      {student.cursus_users[1].grade !== null && (
+        <Text style={styles.text}>Grade: {student.cursus_users[1].grade}</Text>
+      )}
+      {student.cursus_users[1].blackholed_at !== null ? (
+        <Text style={styles.text}>
+          Day left:{" "}
+          {Math.round(
+            (new Date(student.cursus_users[1].blackholed_at) - new Date()) /
+              (1000 * 60 * 60 * 24)
+          )}
+        </Text>
+      ) : (
+        <Text style={styles.text}>No BlackHool</Text>
+      )}
       <View style={styles.separator} />
       <View style={styles.separator} />
-      <Text style={styles.text_project}>Projects:</Text>
+      {student.projects_users.length > 0 && (
+        <Text style={styles.text_project}>Projects:</Text>
+      )}
       {displayProjects(student.projects_users)}
+      {student.projects_users.length > 0 && (
+        <Text style={styles.text_project}>
+          Average: {getAverage(student.projects_users)}%
+        </Text>
+      )}
       <View style={styles.separator} />
       <View style={styles.separator} />
-      <Text style={styles.text_project}>Skills:</Text>
+      {student.cursus_users[1].skills.length > 0 && (
+        <Text style={styles.text_project}>Skills:</Text>
+      )}
       {displaySkills(student.cursus_users[1].skills)}
       {everUseGrademe(student.login)}
     </ScrollView>
@@ -201,7 +226,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 5,
-    fontFamily: 'Courier New',
+    fontFamily: "Courier New",
     fontSize: 17,
   },
   text_project: {
@@ -209,31 +234,30 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     paddingRight: 16,
     padding: 16,
-    fontWeight: 'bold',
-    fontFamily: 'Courier New',
+    fontWeight: "bold",
+    fontFamily: "Courier New",
     fontSize: 18,
   },
   login: {
     flex: 1,
     alignItems: "center",
     padding: 16,
-    fontWeight: 'bold',
-    fontFamily: 'Courier New',
+    fontWeight: "bold",
+    fontFamily: "Courier New",
     fontSize: 15,
   },
   searchContainer: {
-    width: '100%',
-    backgroundColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderTopColor: 'transparent',
+    width: "100%",
+    backgroundColor: "transparent",
+    borderBottomColor: "transparent",
+    borderTopColor: "transparent",
     marginBottom: 16,
   },
   searchInputContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 4,
   },
   project_mark: {
-    // flex: 1,
     flexDirection: "row",
   },
   studentImage: {
@@ -253,7 +277,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: "#007BFF",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 4,
@@ -273,15 +297,15 @@ const styles = StyleSheet.create({
   },
   projectName: {
     flex: 1,
-    marginRight: 8, // Ajoutez une marge à droite pour éviter que le texte ne chevauche l'indicateur de statut
+    marginRight: 8,
   },
   projectName_mark: {
     flex: 1,
-    marginRight: 8, // Ajoutez une marge à droite pour éviter que le texte ne chevauche l'indicateur de statut
-    fontWeight: 'bold',
-    fontFamily: 'Courier New',
+    marginRight: 8,
+    fontWeight: "bold",
+    fontFamily: "Courier New",
     fontSize: 16,
-    color: 'gray',
+    color: "gray",
   },
   input: {
     width: "100%",
@@ -298,7 +322,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   separator: {
-    borderBottomColor: 'black',
+    borderBottomColor: "black",
     borderBottomWidth: 1,
     marginVertical: 8,
   },
@@ -322,7 +346,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   skillName: {
-    // fontWeight: "bold",
     fontSize: 14,
     flex: 1,
   },
