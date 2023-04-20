@@ -21,6 +21,8 @@ function AppNavigation() {
   const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
+    setIsAuthenticated(false);
+    AsyncStorage.clear();
     const checkToken = async () => {
       try {
         const accessToken = await AsyncStorage.getItem('accessToken');
