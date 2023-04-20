@@ -74,7 +74,6 @@ const SearchScreen = (props) => {
     AsyncStorage.setItem('studentLogin', login);
     setIsLoading(true);
     console.log("🔍 Search info about " + login + "...");
-    // console.log(AsyncStorage.getItem('accessToken'));
     getStudents(login).then((students) => {
       console.log("✅ Successfully find " + login);
       props.navigation.navigate('Student Informations', { student: students });

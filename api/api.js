@@ -2,8 +2,6 @@
 import axios from 'axios';
 import { INTRA_CLIENT_ID, INTRA_CLIENT_SECRET } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
 
 const qs = require('querystring');
 

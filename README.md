@@ -3,5 +3,6 @@ Swifty Companion is my first project created in React Native. It allows, with th
 
 To launch : 
 1. do npm install
-2. create a .env file and fill it with your intra credentials INTRA_CLIENT_ID and INTRA_CLIENT_SECRET
+2. Create your API 42 here : https://profile.intra.42.fr/oauth/applications , using "grademecompanion://redirect" for redirect url
+2. create a .env file and fill it with your intra API credentials INTRA_CLIENT_ID and INTRA_CLIENT_SECRET
 3. Launch using npx expo start -c
